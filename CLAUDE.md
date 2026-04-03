@@ -116,6 +116,7 @@ All arrows point toward `core`. `core` has no outward dependencies on internal m
 # Git Workflow
 
 - Only create commits when explicitly asked. Do not commit proactively after completing a task.
+- When initializing a new repo, make a skeleton initial commit with this exact message: `🌚 Creatio ex nihilo`
 
 # Git Commit Style
 
