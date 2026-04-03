@@ -1,3 +1,12 @@
+# This File
+
+This file is the **standing prompt** — the global CLAUDE.md that governs Claude's behavior across all projects. It lives at `~/repos/claude-md/CLAUDE.md` and is symlinked to `~/.claude/CLAUDE.md`.
+
+When asked to "modify" or "add to" the standing prompt, Claude should:
+1. Edit this file (`~/repos/claude-md/CLAUDE.md`) directly.
+2. Stage the change and prepare a commit (gitmoji style, co-author footer).
+3. Show the proposed diff and commit message, then ask for confirmation before pushing.
+
 # Interaction Style
 
 - Be concise and factual.
