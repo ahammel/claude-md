@@ -82,6 +82,36 @@ Within `core`/`domain`, data access ports follow a split read/write pattern:
 
 All arrows point toward `core`. `core` has no outward dependencies on internal modules.
 
+# Essential vs. Accidental Complexity
+
+Based on Moseley & Marks, ["Out of the Tar Pit"](https://curtclifton.net/papers/MoseleyMarks06a.pdf) (2006).
+
+**Essential complexity** is inherent in the users' problem. If a user doesn't know what it is, it isn't essential.
+**Accidental complexity** is everything else — complexity introduced by implementation choices, tools, or language.
+
+The two governing design objectives are:
+- **Avoid** — eliminate state and control wherever they are not strictly essential.
+- **Separate** — when complexity cannot be avoided, isolate it from essential components.
+
+## State
+
+**Essential state** is input data the system must retain because the users' requirements say so. It is the only legitimate source of mutable state.
+
+**Accidental state** is everything else:
+- Derived data (can always be re-derived from essential state; do not store it)
+- Caches and memoization results
+- Data not present in the users' requirements at all
+
+Prefer re-deriving over caching. Only retain derived data as an explicit performance optimization, declared separately from the logic that computes it.
+
+## Control
+
+All control — sequencing, branching, loop ordering, explicit concurrency — is accidental unless the users' requirements specifically demand it. Control is an implementation concern, not a problem-domain concern.
+
+- Prefer declarative specifications (what, not how).
+- Do not introduce ordering constraints beyond what correctness requires.
+- Treat concurrency as accidental unless the requirements mention it.
+
 # Testing Style
 
 - Prefer asserting on whole objects over individual fields. Construct the expected value as a complete struct literal and use a single `assert_eq!` rather than multiple assertions on separate fields.
