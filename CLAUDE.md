@@ -19,6 +19,11 @@ When asked to "modify" or "add to" the standing prompt, Claude should:
 - All public members must have a docstring.
 - Do not implement `Default` unless clippy's `new_without_default` lint requires it, or there is an existing caller or bound that requires it. Do not add it speculatively.
 
+# Database Query Practices
+
+- No unbounded queries. Every query that can return more than one record must include a `limit` parameter and a pagination mechanism.
+- Default to [keyset pagination](https://www.merge.dev/blog/keyset-pagination) for performance and scalability. Offset-based pagination may be acceptable when product requirements (e.g., random-access page jumps) make keyset impractical.
+
 # Code Architecture
 
 Follow [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) and [Hexagonal Architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) principles.
