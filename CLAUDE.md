@@ -145,6 +145,10 @@ All control — sequencing, branching, loop ordering, explicit concurrency — i
 - Use `rustfmt` for formatting and `clippy` for linting.
 - Name the core crate `domain` (not `core` — conflicts with Rust's standard library crate).
 - `lib.rs` contains only module declarations (`pub mod foo;`). Actual code lives in dedicated module files.
+- File naming within a module follows entity-based grouping:
+  - `{entity}.rs` — the domain entity and closely related types
+  - `{entity}_repo.rs` — the repo port definitions (`XxxProvider`, `XxxPersistor`, `XxxRepo`) for that entity
+  - `{entity}_store.rs` — the store/service-layer wrapper (`XxxStore`) for that entity
 - Makefile should include these additional aliases beyond the standard `p`/`l`/`t`:
   - `c check` — `cargo check --all`
   - `b build` — `cargo build --all`
