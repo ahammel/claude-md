@@ -139,6 +139,7 @@ All control — sequencing, branching, loop ordering, explicit concurrency — i
   - `p` — run the pretty printer
   - `l` — run the linter
   - `t` — run the unit tests
+- Only declare `.PHONY` for targets whose names coincide with files that exist in the project. Short single-letter aliases (`p`, `l`, `t`, etc.) are never files, so they need no `.PHONY` declaration.
 - Before committing: run the pretty printer, then the linter, then the unit tests, in that order.
   - Scope the test run to relevant tests when possible. If running the full suite takes ~30 seconds or less, run it all.
   - The Makefile aliases can be used, but it's fine to invoke tools directly (e.g., to pass flags that restrict the test scope).
