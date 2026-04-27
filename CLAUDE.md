@@ -162,6 +162,27 @@ All control — sequencing, branching, loop ordering, explicit concurrency — i
   - `br build-release` — `cargo build --release --all`
 - Pre-commit hook runs in this order: `cargo check` → `cargo fmt --check` → `cargo clippy`. Do **not** run tests in the pre-commit hook.
 
+### Error Handling
+
+**Libraries**
+
+- [`exn`](https://crates.io/crates/exn) — wraps errors with call-site location and a causal chain. Use `Exn<E>` as the error type in `Result` everywhere. The type parameter forces explicit conversion when crossing error-type boundaries; bare `?` will not compile if the source and target `E` differ.
+- [`anomalies`](https://crates.io/crates/anomalies) — attaches structured retry/classification metadata to errors via `#[derive(Anomaly)]` on enums. Each variant carries a `category` (e.g., `Unavailable`, `Interrupted`, `Fault`) and a `status` (`Temporary` / `Permanent`). Callers use these to decide whether to retry, surface the error to the user, or page an operator — without parsing message strings.
+- [`thiserror`](https://crates.io/crates/thiserror) — reduces boilerplate for error type definitions. Use `#[derive(Error)]` and `#[error("...")]` on domain error enums and structs.
+
+**Crate-level error architecture**
+
+Each crate defines its own `Error` enum. The `domain` crate provides a `DbError` marker trait (`DbError: Anomaly + Send + Sync + 'static`) that `db` crates implement on their error types. All failable operations return `Result<T, Exn<Error>>` where `Error` is the *crate's own* error type. The type system makes cross-layer error leakage a compile error: bubbling an `Exn<db::Error>` into a function returning `Exn<domain::Error>` requires an explicit `map_err` or `or_raise` call, which forces a conscious decision about context and framing at each boundary.
+
+**Parameter capture**
+
+Errors should capture the parameters that give the failure meaning to whoever handles it. The rule is boundary-driven:
+
+- **Service layer** — captures the parameters representing user intent (e.g., the resource ID, the action requested). These are attached when translating a domain error into an API response so that operators can correlate logs to user actions.
+- **DB layer** — captures the parameters sent to the database before they leave the system's control. Once a query fires, those values are gone from our context; the error is the last chance to record them.
+- **Between layers** — capture a parameter in an error only if it is *not* passed to a lower, failable call. For example, if processing a batch, the batch index is not forwarded to the database, so include it in the error at the domain layer. If the parameter is forwarded, the lower layer is responsible for capturing it.
+- **Prefer struct fields over message strings** — encode captured parameters as typed fields on an error struct so that receivers can inspect and act on them without parsing. Reserve the `#[error("...")]` message for human-readable display only.
+
 # Git Workflow
 
 - Only create commits when explicitly asked. Do not commit proactively after completing a task.
