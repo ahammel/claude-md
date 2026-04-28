@@ -131,6 +131,12 @@ All control — sequencing, branching, loop ordering, explicit concurrency — i
 - Prefer asserting on whole objects over individual fields. Construct the expected value as a complete struct literal and use a single `assert_eq!` rather than multiple assertions on separate fields.
 - Only assert on individual fields or accessor return values when a meaningful whole-object expected value cannot be expressed (e.g. types with private fields that lack a struct-literal form).
 
+## Coverage Goals
+
+**Unit tests** aim for as close to 100% line coverage and mutation coverage as possible. For this purpose, "unit tests" includes system tests that wire together several modules but do not make real HTTP API calls or talk to real storage engines (i.e., all I/O is stubbed or in-process).
+
+**Integration tests** may use real HTTP calls and locally running storage engines. Their goal is 100% [integration path coverage](https://www.sciencedirect.com/science/article/abs/pii/S0957417425034293). An *integration path* is an execution path that spans multiple functions through their call relationships — distinct from a *basis path*, which is a feasible path within a single function. Integration path coverage is achieved when every such cross-function execution path is exercised by at least one test case.
+
 # Preferred Tools
 
 - Every project has a unit test suite, a static linter, and a pretty printer.
